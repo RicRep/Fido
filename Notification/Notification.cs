@@ -32,68 +32,90 @@ namespace Fido_Main.Notification
 {
   static class Notification
   {
+      private static List<string> GetAttachmentList(FidoReturnValues lFidoReturnValues)
+      {
+          return new List<string>
+          {
+            Application.StartupPath + "\\media\\gauge\\total" + lFidoReturnValues.TotalScore.ToString(CultureInfo.InvariantCulture) + ".png",
+            Application.StartupPath + "\\media\\gauge\\red" + lFidoReturnValues.UserScore.ToString(CultureInfo.InvariantCulture) + ".png",
+            Application.StartupPath + "\\media\\gauge\\red" + lFidoReturnValues.MachineScore.ToString(CultureInfo.InvariantCulture) + ".png",
+            Application.StartupPath + "\\media\\gauge\\red" + lFidoReturnValues.ThreatScore.ToString(CultureInfo.InvariantCulture) + ".png"
+          };
+      }
+
+      private string GetSubject(FidoReturnValues lFidoReturnValues)
+      {
+          string sSubject = string.Empty;
+
+          if (lFidoReturnValues.IsPreviousAlert)
+          {
+              sSubject = @"Previously Alerted! Fido Alert: " + lFidoReturnValues.MalwareType + ". ";
+          }
+          else
+          {
+              sSubject = @"Fido Alert: " + lFidoReturnValues.MalwareType + ". ";
+          }
+
+          if (lFidoReturnValues.IsHostKnown)
+          {
+              sSubject += "Hostname = " + lFidoReturnValues.Hostname;
+          }
+          else
+          {
+              sSubject += "Hostname = Unknown (" + lFidoReturnValues.SrcIP + ")";
+          }
+
+          if (!lFidoReturnValues.IsTargetOS)
+          {
+              sSubject = "Fido InfoSec only Alert : Target OS does not match.";
+          }
+          else if (!lFidoReturnValues.IsSendAlert)
+          {
+              sSubject = "Fido InfoSec only alert. " + lFidoReturnValues.MalwareType + ". Hostname = " + lFidoReturnValues.Hostname + " (" + lFidoReturnValues.SrcIP + ")";
+          }
+
+          if (lFidoReturnValues.IsTest) sSubject = @"TEST: " + sSubject;
+
+          return sSubject;
+      }
+
+      private void PrepareFidoReturnValues(FidoReturnValues lFidoReturnValues)
+      {
+          lFidoReturnValues = SummaryEmail(lFidoReturnValues);
+          lFidoReturnValues.Recommendation = ReturnRecommendation(lFidoReturnValues);
+          lFidoReturnValues.SummaryEmail = ReplacingValues(lFidoReturnValues.SummaryEmail, lFidoReturnValues);
+          lFidoReturnValues.SummaryEmail = ReplacingBadGuyValues(lFidoReturnValues.SummaryEmail, lFidoReturnValues);
+          lFidoReturnValues.IsTest = Object_Fido_Configs.GetAsBool("fido.application.teststartup", true);
+      }
+
+      private void SendMail(string sSubject, FidoReturnValues lFidoReturnValues)
+      {
+          var sFidoEmail = Object_Fido_Configs.GetAsString("fido.email.fidoemail", null);
+          var sPrimaryEmail = Object_Fido_Configs.GetAsString("fido.email.primaryemail", null);
+          var sSecondaryEmail = Object_Fido_Configs.GetAsString("fido.email.secondaryemail", null);
+          var sNonAlertEmail = Object_Fido_Configs.GetAsString("fido.email.nonalertemail", null);
+          var lAttachment = GetAttachmentList();
+
+          if (lFidoReturnValues.IsSendAlert)
+          {
+              Email_Send.Send(sPrimaryEmail, sSecondaryEmail, sFidoEmail, sSubject, lFidoReturnValues.SummaryEmail, lAttachment, null);
+          }
+          else
+          {
+              Email_Send.Send(sNonAlertEmail, sNonAlertEmail, sFidoEmail, sSubject, lFidoReturnValues.SummaryEmail, lAttachment, null);
+          }
+      }
+
     //module to compose notifications
     public static void Notify (FidoReturnValues lFidoReturnValues)
     {
       try
       {
-        var sFidoEmail = Object_Fido_Configs.GetAsString("fido.email.fidoemail", null);
-        var sPrimaryEmail = Object_Fido_Configs.GetAsString("fido.email.primaryemail", null);
-        var sSecondaryEmail = Object_Fido_Configs.GetAsString("fido.email.secondaryemail", null);
-        var sNonAlertEmail = Object_Fido_Configs.GetAsString("fido.email.nonalertemail", null);
-        var lAttachment = new List<string>
-      {
-        Application.StartupPath + "\\media\\gauge\\total" + lFidoReturnValues.TotalScore.ToString(CultureInfo.InvariantCulture) + ".png",
-        Application.StartupPath + "\\media\\gauge\\red" + lFidoReturnValues.UserScore.ToString(CultureInfo.InvariantCulture) + ".png",
-        Application.StartupPath + "\\media\\gauge\\red" + lFidoReturnValues.MachineScore.ToString(CultureInfo.InvariantCulture) + ".png",
-        Application.StartupPath + "\\media\\gauge\\red" + lFidoReturnValues.ThreatScore.ToString(CultureInfo.InvariantCulture) + ".png"
-      };
+        PrepareFidoReturnValues(lFidoReturnValues);
 
+        string sSubject = GetSubject(lFidoReturnValues);
 
-        string sSubject;
-        if (lFidoReturnValues.IsPreviousAlert)
-        {
-          sSubject = @"Previously Alerted! Fido Alert: " + lFidoReturnValues.MalwareType + ". ";
-        }
-        else
-        {
-          sSubject = @"Fido Alert: " + lFidoReturnValues.MalwareType + ". ";
-        }
-
-        if (lFidoReturnValues.IsHostKnown)
-        {
-          sSubject += "Hostname = " + lFidoReturnValues.Hostname;
-        }
-        else
-        {
-          sSubject += "Hostname = Unknown (" + lFidoReturnValues.SrcIP + ")";
-        }
-
-        lFidoReturnValues = SummaryEmail(lFidoReturnValues);
-        lFidoReturnValues.Recommendation = ReturnRecommendation(lFidoReturnValues);
-        lFidoReturnValues.SummaryEmail = ReplacingValues(lFidoReturnValues.SummaryEmail, lFidoReturnValues);
-        lFidoReturnValues.SummaryEmail = ReplacingBadGuyValues(lFidoReturnValues.SummaryEmail, lFidoReturnValues);
-
-        if (!lFidoReturnValues.IsTargetOS)
-        {
-          sSubject = "Fido InfoSec only Alert : Target OS does not match.";
-        }
-        else if (!lFidoReturnValues.IsSendAlert)
-        {
-          sSubject = "Fido InfoSec only alert. " + lFidoReturnValues.MalwareType + ". Hostname = " + lFidoReturnValues.Hostname + " (" + lFidoReturnValues.SrcIP + ")";
-        }
-
-        lFidoReturnValues.IsTest = Object_Fido_Configs.GetAsBool("fido.application.teststartup", true);
-        if (lFidoReturnValues.IsTest) sSubject = @"TEST: " + sSubject;
-
-        if (lFidoReturnValues.IsSendAlert)
-        {
-          Email_Send.Send(sPrimaryEmail, sSecondaryEmail, sFidoEmail, sSubject, lFidoReturnValues.SummaryEmail, lAttachment, null);
-        }
-        else
-        {
-          Email_Send.Send(sNonAlertEmail, sNonAlertEmail, sFidoEmail, sSubject, lFidoReturnValues.SummaryEmail, lAttachment, null);
-        }
+        SendMail(sSubject, lFidoReturnValues);
       }
       catch (Exception e)
       {
