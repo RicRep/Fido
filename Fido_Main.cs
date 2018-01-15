@@ -35,47 +35,57 @@ namespace Fido_Main
       InitializeComponent();
     }
     
+    private void DisableCurrentTime()
+    {
+        timer1.Enabled = false;
+        Hide();
+    }
+
+    private void CheckIfFidoConfigurationExists()
+    {
+        Console.Clear();
+        var sAppStartupPath = Application.StartupPath + @"\data\fido.db";
+        if (!File.Exists(sAppStartupPath))
+        {
+            Console.WriteLine(@"Failed to load FIDO DB.");
+            Application.Exit();
+        }
+        else { Console.WriteLine(@"Loaded FIDO DB successfully."); }
+    }
+
+    private Dictionary<string, string> GetSysLogParams()
+    {
+        var result = new Dictionary<string, string>();
+        result.add("server", Object_Fido_Configs.GetAsString("fido.logger.syslog.server", "localhost"));
+        result.add("port", Object_Fido_Configs.GetAsInt("fido.logger.syslog.port", 514));
+        result.add("facility", Object_Fido_Configs.GetAsString("fido.logger.syslog.facility", "local1"));
+        result.add("sender", Object_Fido_Configs.GetAsString("fido.logger.syslog.sender", "Fido"));
+        result.add("layout", Object_Fido_Configs.GetAsString("fido.logger.syslog.layout", "$(message)"));
+        result.add("isParamTest", Object_Fido_Configs.GetAsBool("fido.application.teststartup", true));
+        result.add("detectors", Object_Fido_Configs.GetAsString("fido.application.detectors", string.Empty).Split(','));
+
+        return result;
+    }
+
     //The load will grab configurations for what FIDO is monitoring,
     //then go to each configured external system to parse any alerts.
     //Finally, FIDO is configured to pause per iteration on a 
     //configurable timed basis.
     private void Fido_Load(object sender, EventArgs aug)
     {
-      //Disabled the current time during current iteration.
-      timer1.Enabled = false;
-      Hide();
-
-      //Check to see if Fido configurations exists and if not
-      //fail with prompt that configurations are not found.
-      Console.Clear();
-      var sAppStartupPath = Application.StartupPath + @"\data\fido.db";
-      if (!File.Exists(sAppStartupPath))
-      {
-        Console.WriteLine(@"Failed to load FIDO DB.");
-        Application.Exit();
-      }
-      else {Console.WriteLine(@"Loaded FIDO DB successfully.");}
+        DisableCurrentTime();
+        CheckIfFidoConfigurationExists();
 
       //Load fido configs from database
       Object_Fido_Configs.LoadConfigFromDb("config");
 
-      //Setup syslog
-      var server1 = Object_Fido_Configs.GetAsString("fido.logger.syslog.server", "localhost");
-      var port1 = Object_Fido_Configs.GetAsInt("fido.logger.syslog.port", 514);
-      var facility1 = Object_Fido_Configs.GetAsString("fido.logger.syslog.facility", "local1");
-      var sender1 = Object_Fido_Configs.GetAsString("fido.logger.syslog.sender", "Fido");
-      var layout1 = Object_Fido_Configs.GetAsString("fido.logger.syslog.layout", "$(message)");
-      //SysLogger.Setup(server1, port1, facility1, sender1, layout1);
-
-      //Beginning of primary area which starts parsing of alerts.
-      var isParamTest = Object_Fido_Configs.GetAsBool("fido.application.teststartup", true);
-      var sDetectors = Object_Fido_Configs.GetAsString("fido.application.detectors", string.Empty).Split(',');
+      var sysLogParams = GetSysLogParams();
 
       try
       {
         Console.WriteLine(isParamTest ? @"Running test configs." : @"Running production configs.");
 
-        foreach (var detect in sDetectors)
+        foreach (var detect in sysLogParams[detectors])
         {
           var parseConfigs = Object_Fido_Configs.ParseDetectorConfigs(detect);
           //Get the detector, ie, email, log, web service, etc.
