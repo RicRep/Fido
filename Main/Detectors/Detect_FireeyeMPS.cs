@@ -48,50 +48,17 @@ namespace Fido_Main.Main.Detectors
         if (string.IsNullOrEmpty(malwareType) && (String.Compare(malwareType, "malware-callback detected", StringComparison.Ordinal) == 0) || (String.Compare(malwareType, "malware-object detected", StringComparison.Ordinal) == 0))
         {
           Console.WriteLine(@"Malware-callback detected");
-          Logging_Fido.RunLogging(malwareType + "!");
-          lFidoReturnValues = FireEyeParse(sEmailBody, false);
-          if (!Fido_NetSegments.isEmptySrcIP(lFidoReturnValues.SrcIP)) return;
-          lFidoReturnValues.IsTargetOS = true;
-          //hand of process to get more information about the host
-          lFidoReturnValues.MalwareType = sSubjectArray[0];
-          lFidoReturnValues.CurrentDetector = "mps";
-          TheDirector.Direct(lFidoReturnValues);
-          //consider do an else in case srcip comes back empty
-          //else
-          //{ 
-          //}
+          XX(lFidoReturnValues, false);
         }
         else if (malwareType != null && String.Compare(malwareType, "web-infection detected", StringComparison.Ordinal) == 0)
         {
           Console.WriteLine(@"Web-infection detected.");
-          Logging_Fido.RunLogging(malwareType + "!");
-          lFidoReturnValues = FireEyeParse(sEmailBody, true);
-          if (!Fido_NetSegments.isEmptySrcIP(lFidoReturnValues.SrcIP)) return;
-          lFidoReturnValues.IsTargetOS = true;
-          //hand of process to get more information about the host
-          lFidoReturnValues.MalwareType = sSubjectArray[0];
-          lFidoReturnValues.CurrentDetector = "mps";
-          TheDirector.Direct(lFidoReturnValues);
-          //consider do an else in case srcip comes back empty
-          //else
-          //{ 
-          //}
+          XX(lFidoReturnValues, true);
         }
         else if (malwareType != null && String.Compare(malwareType, "infection-match detected", StringComparison.Ordinal) == 0)
         {
           Console.WriteLine(@"Infection-match detected.");
-          Logging_Fido.RunLogging(malwareType + "!");
-          lFidoReturnValues = FireEyeParse(sEmailBody, false);
-          if (!Fido_NetSegments.isEmptySrcIP(lFidoReturnValues.SrcIP)) return;
-          lFidoReturnValues.IsTargetOS = true;
-          //hand of process to get more information about the host
-          lFidoReturnValues.MalwareType = sSubjectArray[0];
-          lFidoReturnValues.CurrentDetector = "mps";
-          TheDirector.Direct(lFidoReturnValues);
-          //consider do an else in case srcip comes back empty
-          //else
-          //{ 
-          //}
+          XX(lFidoReturnValues, false);
         }
         Console.WriteLine(@"Exiting FireEye detector.");
       }
@@ -99,6 +66,18 @@ namespace Fido_Main.Main.Detectors
       {
         Fido_EventHandler.SendEmail("Fido Error", "Fido Failed: {0} Exception caught receiving FireEye email:" + e);
       }
+    }
+
+    private void XX(FidoReturnValues fidoReturnValues, bool isWebInfection)
+    {
+        Logging_Fido.RunLogging(malwareType + "!");
+        fidoReturnValues = FireEyeParse(sEmailBody, isWebInfection);
+        if (!Fido_NetSegments.isEmptySrcIP(fidoReturnValues.SrcIP)) return;
+        fidoReturnValues.IsTargetOS = true;
+        //hand of process to get more information about the host
+        fidoReturnValues.MalwareType = sSubjectArray[0];
+        fidoReturnValues.CurrentDetector = "mps";
+        TheDirector.Direct(fidoReturnValues);
     }
 
     public static void FireEyeSyslogReceive(string sSyslog)
