@@ -344,6 +344,29 @@ namespace Fido_Main.Notification
       return lFidoReturnValues;
     }
 
+  private void AddRecommendations(List<string>() recommendation)
+  {
+    switch (lFidoReturnValues.Antivirus.Status.ToLower())
+    {
+    case "cleanable":
+        recommendation.Add("Action required");
+        recommendation.Add("Antivirus was unable to remove the threat, but this malware is cleanable.");
+        break;
+    case "cleanup failed":
+        recommendation.Add("Action required");
+        recommendation.Add("Antivirus attempted to cleanup malware, but failed. Make sure system is offline and attempt cleanup again.");
+        break;
+    case "restart required":
+        recommendation.Add("Action required");
+        recommendation.Add("Antivirus attempted to cleanup malware, but requires a reboot to complete remediation.");
+        break;
+    case "not cleanable":
+        recommendation.Add("Re-image");
+        recommendation.Add("Antivirus is not capable of removing this malware and the system will need to be rebuilt.");
+        break;
+    }
+  }
+
     private static List<string> ReturnRecommendation(FidoReturnValues lFidoReturnValues)
     {
       var recommendation = new List<string>();
@@ -391,49 +414,11 @@ namespace Fido_Main.Notification
         var sNewThreatName = lFidoReturnValues.Antivirus.ThreatName.Split('/');
         if (sNewThreatName != null)
         {
-          switch (lFidoReturnValues.Antivirus.ActionTaken.ToLower())
+          switch (lFidoReturnValues.Antivirus.ActionTaken.ToLowerInvariant())
           {
             case "none":
-              switch (lFidoReturnValues.Antivirus.Status.ToLower())
-              {
-                case "cleanable":
-                  recommendation.Add("Action required");
-                  recommendation.Add("Antivirus was unable to remove the threat, but this malware is cleanable.");
-                  break;
-                case "cleanup failed":
-                  recommendation.Add("Action required");
-                  recommendation.Add("Antivirus attempted to cleanup malware, but failed. Make sure system is offline and attempt cleanup again.");
-                  break;
-                case "restart required":
-                  recommendation.Add("Action required");
-                  recommendation.Add("Antivirus attempted to cleanup malware, but requires a reboot to complete remediation.");
-                  break;
-                case "not cleanable":
-                  recommendation.Add("Re-image");
-                  recommendation.Add("Antivirus is not capable of removing this malware and the system will need to be rebuilt.");
-                  break;
-              }
-              break;
             case "partially removed":
-              switch (lFidoReturnValues.Antivirus.Status.ToLower())
-              {
-                case "cleanable":
-                  recommendation.Add("Action required");
-                  recommendation.Add("Antivirus was unable to remove the threat, but this malware is cleanable.");
-                  break;
-                case "cleanup failed":
-                  recommendation.Add("Action required");
-                  recommendation.Add("Antivirus attempted to cleanup malware, but failed. Make sure system is offline and attempt cleanup again.");
-                  break;
-                case "restart required":
-                  recommendation.Add("Action required");
-                  recommendation.Add("Antivirus attempted to cleanup malware, but requires a reboot to complete remediation.");
-                  break;
-                case "not cleanable":
-                  recommendation.Add("Re-image");
-                  recommendation.Add("Antivirus is not capable of removing this malware and the system will need to be rebuilt.");
-                  break;
-              }
+              AddRecommendations(recommendation);
               break;
           }
         }
