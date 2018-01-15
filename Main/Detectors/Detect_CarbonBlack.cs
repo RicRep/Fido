@@ -202,7 +202,7 @@ namespace Fido_Main.Main.Detectors
           lFidoReturnValues.PreviousAlerts = Matrix_Historical_Helper.GetPreviousMachineAlerts(lFidoReturnValues, false);
           if (lFidoReturnValues.PreviousAlerts.Alerts != null && lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count > 0)
           {
-            isRunDirector = PreviousAlert(lFidoReturnValues, lFidoReturnValues.AlertID, lFidoReturnValues.TimeOccurred);
+            isRunDirector = AlertHelper.PreviousAlert(lFidoReturnValues, lFidoReturnValues.AlertID, lFidoReturnValues.TimeOccurred);
           }
           if (isRunDirector || lFidoReturnValues.MalwareType.Contains("EICAR")) continue;
           //todo: build better filetype versus targetted OS, then remove this.
@@ -260,20 +260,6 @@ namespace Fido_Main.Main.Detectors
       {
         Fido_EventHandler.SendEmail("Fido Error", "Fido Failed: {0} Exception caught in Carbon Black alert area:" + e);
       }
-    }
-
-    private static bool PreviousAlert(FidoReturnValues lFidoReturnValues, string event_id, string event_time)
-    {
-      var isRunDirector = false;
-      for (var j = 0; j < lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count; j++)
-      {
-        if (lFidoReturnValues.PreviousAlerts.Alerts.Rows[j][6].ToString() != event_id) continue;
-        if (Convert.ToDateTime(event_time) == Convert.ToDateTime(lFidoReturnValues.PreviousAlerts.Alerts.Rows[j][4].ToString()))
-        {
-          isRunDirector = true;
-        }
-      }
-      return isRunDirector;
     }
 
     private static Dictionary<string, string> GetDict(DataTable dt)

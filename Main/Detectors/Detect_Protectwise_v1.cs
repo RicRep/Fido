@@ -191,7 +191,7 @@ namespace Fido_Main.Main.Detectors
             lFidoReturnValues.PreviousAlerts = Matrix_Historical_Helper.GetPreviousMachineAlerts(lFidoReturnValues, false);
             if (lFidoReturnValues.PreviousAlerts.Alerts != null && lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count > 0)
             {
-              isRunDirector = PreviousAlert(lFidoReturnValues, lFidoReturnValues.ProtectWise.EventID, lFidoReturnValues.ProtectWise.EventTime);
+                isRunDirector = AlertHelper.PreviousAlert(lFidoReturnValues, lFidoReturnValues.ProtectWise.EventID, lFidoReturnValues.ProtectWise.EventTime);
             }
             if (isRunDirector || lFidoReturnValues.MalwareType.Contains("EICAR")) return;
 
@@ -274,20 +274,6 @@ namespace Fido_Main.Main.Detectors
       }
 
       return lFidoReturnValues;
-    }
-
-    private static bool PreviousAlert(FidoReturnValues lFidoReturnValues, string event_id, string event_time)
-    {
-      var isRunDirector = false;
-      for (var j = 0; j < lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count; j++)
-      {
-        if (lFidoReturnValues.PreviousAlerts.Alerts.Rows[j][6].ToString() != event_id) continue;
-        if (Convert.ToDateTime(event_time) == Convert.ToDateTime(lFidoReturnValues.PreviousAlerts.Alerts.Rows[j][4].ToString()))
-        {
-          isRunDirector = true;
-        }
-      }
-      return isRunDirector;
     }
 
     private static DateTime? FromEpochTime(string unixTime)

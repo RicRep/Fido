@@ -188,7 +188,7 @@ namespace Fido_Main.Main.Detectors
           lFidoReturnValues.PreviousAlerts = Matrix_Historical_Helper.GetPreviousMachineAlerts(lFidoReturnValues, false);
           if (lFidoReturnValues.PreviousAlerts.Alerts != null && lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count > 0)
           {
-            isRunDirector = PreviousAlert(lFidoReturnValues, lFidoReturnValues.PaloAlto.EventID, lFidoReturnValues.PaloAlto.EventTime);
+              isRunDirector = AlertHelper.PreviousAlert(lFidoReturnValues, lFidoReturnValues.PaloAlto.EventID, lFidoReturnValues.PaloAlto.EventTime);
           }
           if (isRunDirector || lFidoReturnValues.MalwareType.Contains("EICAR")) continue;
           //todo: build better filetype versus targetted OS, then remove this.
@@ -203,20 +203,6 @@ namespace Fido_Main.Main.Detectors
       {
         Fido_EventHandler.SendEmail("Fido Error", "Fido Failed: {0} Exception caught in PANv1 Detector parse:" + e);
       }
-    }
-
-    private static bool PreviousAlert(FidoReturnValues lFidoReturnValues, string event_id, string event_time)
-    {
-      var isRunDirector = false;
-      for (var j = 0; j < lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count; j++)
-      {
-        if (lFidoReturnValues.PreviousAlerts.Alerts.Rows[j][6].ToString() != event_id) continue;
-        if (Convert.ToDateTime(event_time) == Convert.ToDateTime(lFidoReturnValues.PreviousAlerts.Alerts.Rows[j][4].ToString()))
-        {
-          isRunDirector = true;
-        }
-      }
-      return isRunDirector;
     }
 
   }

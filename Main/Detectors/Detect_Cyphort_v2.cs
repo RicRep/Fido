@@ -125,7 +125,7 @@ namespace Fido_Main.Main.Detectors
             //alert versus previous alerts.
             if (lFidoReturnValues.PreviousAlerts.Alerts != null && lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count > 0)
             {
-              isRunDirector = PreviousAlert(lFidoReturnValues);
+                isRunDirector = AlertHelper.PreviousAlert(lFidoReturnValues);
             }
 
             //If the type of alert is a test alert then exit, or if the alert is has already been processed
@@ -170,7 +170,7 @@ namespace Fido_Main.Main.Detectors
             lFidoReturnValues.PreviousAlerts = Matrix_Historical_Helper.GetPreviousMachineAlerts(lFidoReturnValues, false);
             if (lFidoReturnValues.PreviousAlerts.Alerts != null && lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count > 0)
             {
-              isRunDirector = PreviousAlert(lFidoReturnValues);
+                isRunDirector = AlertHelper.PreviousAlert(lFidoReturnValues);
             }
             if (isRunDirector || lFidoReturnValues.MalwareType.Contains("VIRUS_EICAR_TEST_FILE.CY")) continue;
             //todo: build better filetype versus targetted OS, then remove this.
@@ -214,7 +214,7 @@ namespace Fido_Main.Main.Detectors
             lFidoReturnValues.PreviousAlerts = Matrix_Historical_Helper.GetPreviousMachineAlerts(lFidoReturnValues, false);
             if (lFidoReturnValues.PreviousAlerts.Alerts != null && lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count > 0)
             {
-              isRunDirector = PreviousAlert(lFidoReturnValues);
+                isRunDirector = AlertHelper.PreviousAlert(lFidoReturnValues);
             }
             if (isRunDirector || lFidoReturnValues.MalwareType.Contains("VIRUS_EICAR_TEST_FILE.CY")) continue;
             //todo: build better filetype versus targetted OS, then remove this.
@@ -228,19 +228,6 @@ namespace Fido_Main.Main.Detectors
       {
         Fido_EventHandler.SendEmail("Fido Error", "Fido Failed: {0} Exception caught in Cyphort Detector parse:" + e);
       }
-    }
-
-    private static bool PreviousAlert(FidoReturnValues lFidoReturnValues)
-    {
-      var isRunDirector = false;
-      for (var j = 0; j < lFidoReturnValues.PreviousAlerts.Alerts.Rows.Count; j++)
-      {
-        if (lFidoReturnValues.PreviousAlerts.Alerts.Rows[j][6].ToString() == lFidoReturnValues.AlertID)
-        {
-          isRunDirector = true;
-        }
-      }
-      return isRunDirector;
     }
 
     private static bool TargetOSFileType(string[] cyphortArray)

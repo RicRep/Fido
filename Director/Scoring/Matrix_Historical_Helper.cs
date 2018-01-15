@@ -47,7 +47,7 @@ namespace Fido_Main.Director.Scoring
     {
       Console.WriteLine(@"Gathering historical information from FIDO DB.");
       const string historicalQuery = "SELECT * FROM configs_historical_events";
-      var fidoTemp = GetPreviousAlerts(historicalQuery);
+      var fidoTemp = AlertHelper.GetPreviousAlerts(historicalQuery);
       if (fidoTemp.Rows.Count <= 0) return lFidoReturnValues;
       lFidoReturnValues.HistoricalEvent = FormatHistoricalEvents(fidoTemp);
       var urlCount = new DataTable();
@@ -59,7 +59,7 @@ namespace Fido_Main.Director.Scoring
         {
           foreach (var url in lFidoReturnValues.Url)
           {
-            urlCount = GetPreviousAlerts(lFidoReturnValues.HistoricalEvent.UrlQuery.Replace("%url%", url));
+              urlCount = AlertHelper.GetPreviousAlerts(lFidoReturnValues.HistoricalEvent.UrlQuery.Replace("%url%", url));
           }
         }
 
