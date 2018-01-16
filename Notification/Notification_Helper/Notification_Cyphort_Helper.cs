@@ -26,7 +26,7 @@ namespace Fido_Main.Notification.Notification_Helper
   static class Notification_Cyphort_Helper
   {
 
-    public static Dictionary<string, string> CyphortBadGuyReturn(FidoReturnValues lFidoReturnValues, List<string> lBadMD5Hashes, List<string> lGoodMD5Hashes, List<string> lBadURLs, List<string> lGoodURLs, Dictionary<string, string> replacements)
+    public static Dictionary<string, string> CyphortBadGuyReturn(FidoReturnValues lFidoReturnValues, ReplaceParameters replaceParameters)
     {
       if (lFidoReturnValues.Cyphort.VirusTotal != null)
       {
@@ -37,11 +37,11 @@ namespace Fido_Main.Notification.Notification_Helper
             if (lFidoReturnValues.Cyphort.VirusTotal.MD5HashReturn[i].Positives > 0)
             {
               lFidoReturnValues.BadHashs += 1;
-              lBadMD5Hashes.Add(lFidoReturnValues.Cyphort.VirusTotal.MD5HashReturn[i].Permalink);
+              replaceParameters.lBadMD5Hashes.Add(lFidoReturnValues.Cyphort.VirusTotal.MD5HashReturn[i].Permalink);
             }
             else
             {
-              lGoodMD5Hashes.Add(lFidoReturnValues.Cyphort.VirusTotal.MD5HashReturn[i].Permalink);
+                replaceParameters.lGoodMD5Hashes.Add(lFidoReturnValues.Cyphort.VirusTotal.MD5HashReturn[i].Permalink);
             }
           }
         }
@@ -53,11 +53,11 @@ namespace Fido_Main.Notification.Notification_Helper
             if (lFidoReturnValues.Cyphort.VirusTotal.URLReturn[i].Positives > 0)
             {
               lFidoReturnValues.BadUrLs += 1;
-              lBadURLs.Add(lFidoReturnValues.Cyphort.VirusTotal.URLReturn[i].Permalink);
+              replaceParameters.lBadURLs.Add(lFidoReturnValues.Cyphort.VirusTotal.URLReturn[i].Permalink);
             }
             else
             {
-              lGoodURLs.Add(lFidoReturnValues.Cyphort.VirusTotal.URLReturn[i].Permalink);
+                replaceParameters.lGoodURLs.Add(lFidoReturnValues.Cyphort.VirusTotal.URLReturn[i].Permalink);
             }
           }
         }
@@ -99,7 +99,7 @@ namespace Fido_Main.Notification.Notification_Helper
           }
         }
       }
-      replacements = CyphortBadGuyReplacements(lFidoReturnValues, replacements);
+      var replacements = CyphortBadGuyReplacements(lFidoReturnValues, replaceParameters.Replacements);
       return replacements;
     }
 

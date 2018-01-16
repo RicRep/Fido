@@ -26,7 +26,7 @@ namespace Fido_Main.Notification.Notification_Helper
   static class Notfication_ProtectWise_Helper
   {
 
-    public static Dictionary<string, string> ProtectWiseBadGuyReturn(FidoReturnValues lFidoReturnValues, List<string> lBadMD5Hashes, List<string> lGoodMD5Hashes, List<string> lBadURLs, List<string> lGoodURLs, Dictionary<string, string> replacements)
+    public static Dictionary<string, string> ProtectWiseBadGuyReturn(FidoReturnValues lFidoReturnValues, ReplaceParameters replaceParameters)
     {
       if (lFidoReturnValues.ProtectWise.VirusTotal != null)
       {
@@ -37,11 +37,11 @@ namespace Fido_Main.Notification.Notification_Helper
             if (lFidoReturnValues.ProtectWise.VirusTotal.MD5HashReturn[i].Positives > 0)
             {
               lFidoReturnValues.BadHashs += 1;
-              lBadMD5Hashes.Add(lFidoReturnValues.ProtectWise.VirusTotal.MD5HashReturn[i].Permalink);
+              replaceParameters.BadMD5Hashes.Add(lFidoReturnValues.ProtectWise.VirusTotal.MD5HashReturn[i].Permalink);
             }
             else
             {
-              lGoodMD5Hashes.Add(lFidoReturnValues.ProtectWise.VirusTotal.MD5HashReturn[i].Permalink);
+                replaceParameters.GoodMD5Hashes.Add(lFidoReturnValues.ProtectWise.VirusTotal.MD5HashReturn[i].Permalink);
             }
           }
         }
@@ -53,11 +53,11 @@ namespace Fido_Main.Notification.Notification_Helper
             if (lFidoReturnValues.ProtectWise.VirusTotal.URLReturn[i].Positives > 0)
             {
               lFidoReturnValues.BadUrLs += 1;
-              lBadURLs.Add(lFidoReturnValues.ProtectWise.VirusTotal.URLReturn[i].Permalink);
+              replaceParameters.BadURLs.Add(lFidoReturnValues.ProtectWise.VirusTotal.URLReturn[i].Permalink);
             }
             else
             {
-              lGoodURLs.Add(lFidoReturnValues.ProtectWise.VirusTotal.URLReturn[i].Permalink);
+                replaceParameters.GoodURLs.Add(lFidoReturnValues.ProtectWise.VirusTotal.URLReturn[i].Permalink);
             }
           }
         }
@@ -101,6 +101,7 @@ namespace Fido_Main.Notification.Notification_Helper
       }
 
       //Check AlienVault for values
+      var replacements = replaceParameters.Replacements;
       if (lFidoReturnValues.ProtectWise.AlienVault != null)
       {
         replacements.Add("%alienrisk%", lFidoReturnValues.ProtectWise.AlienVault.Risk.ToString(CultureInfo.InvariantCulture));

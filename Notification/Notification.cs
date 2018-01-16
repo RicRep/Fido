@@ -183,8 +183,9 @@ namespace Fido_Main.Notification
       {
         replacements.Add("%detectors%", "No"); 
       }
-
-      replacements = Notfication_Helper.StartReplacements(lFidoReturnValues, detectors, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
+        
+      ReplaceParameters replaceParameters = new ReplaceParameters(lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
+      replacements = Notfication_Helper.StartReplacements(lFidoReturnValues, detectors, replaceParameters);
 
       return replacements.Aggregate(sHtmlBody, (current, replacement) => current.Replace(replacement.Key, replacement.Value));
     }

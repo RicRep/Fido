@@ -25,9 +25,27 @@ using Fido_Main.Fido_Support.Objects.Fido;
 
 namespace Fido_Main.Notification.Notification_Helper
 {
+    public class ReplaceParameters
+    {
+        public List<string> BadMD5Hashes { get; private set; }
+        public List<string> GoodMD5Hashess { get; private set; }
+        public List<string> BadURLss { get; private set; }
+        public List<string> GoodURLss { get; private set; }
+        public Dictionary<string, string> Replacementss { get; private set; }
+
+        public ReplaceParameters(List<string> lBadMD5Hashes, List<string> lGoodMD5Hashes, List<string> lBadURLs, List<string> lGoodURLs, Dictionary<string, string> replacements)
+        {
+            BadMD5Hashes = lBadMD5Hashes;
+            GoodMD5Hashes = lGoodMD5Hashes;
+            BadURLs = lBadURLs;
+            GoodURLs = lGoodURLs;
+            replaceParameters.Replacements = replacements;
+        }
+    }
+
   static class Notfication_Helper
   {
-    public static Dictionary<string, string> StartReplacements(FidoReturnValues lFidoReturnValues, string[] detectors, List<string> lBadMD5Hashes, List<string> lGoodMD5Hashes, List<string> lBadURLs, List<string> lGoodURLs, Dictionary<string, string> replacements)
+    public static Dictionary<string, string> StartReplacements(FidoReturnValues lFidoReturnValues, string[] detectors, ReplaceParameters replaceParameters)
     {
       try
       {
@@ -39,8 +57,8 @@ namespace Fido_Main.Notification.Notification_Helper
             case "cyphortv2":
               if (lFidoReturnValues.Cyphort != null)
               {
-                replacements = Notification_Cyphort_Helper.CyphortBadGuyReturn(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
-                replacements = VTReplacements(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
+                replaceParameters.Replacements = Notification_Cyphort_Helper.CyphortBadGuyReturn(lFidoReturnValues, replaceParameters);
+                replaceParameters.Replacements = VTReplacements(lFidoReturnValues, replaceParameters);
               }
 
               break;
@@ -48,8 +66,8 @@ namespace Fido_Main.Notification.Notification_Helper
             case "cyphortv3":
               if (lFidoReturnValues.Cyphort != null)
               {
-                replacements = Notification_Cyphort_Helper.CyphortBadGuyReturn(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
-                replacements = VTReplacements(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
+                replaceParameters.Replacements = Notification_Cyphort_Helper.CyphortBadGuyReturn(lFidoReturnValues, replaceParameters);
+                replaceParameters.Replacements = VTReplacements(lFidoReturnValues, replaceParameters);
               }
 
               break;
@@ -57,8 +75,8 @@ namespace Fido_Main.Notification.Notification_Helper
             case "protectwisev1-event":
               if (lFidoReturnValues.ProtectWise != null)
               {
-                replacements = Notfication_ProtectWise_Helper.ProtectWiseBadGuyReturn(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
-                replacements = VTReplacements(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
+                replaceParameters.Replacements = Notfication_ProtectWise_Helper.ProtectWiseBadGuyReturn(lFidoReturnValues, replaceParameters);
+                replaceParameters.Replacements = VTReplacements(lFidoReturnValues, replaceParameters);
               }
 
               break;
@@ -66,16 +84,16 @@ namespace Fido_Main.Notification.Notification_Helper
             case "carbonblackv1":
               if (lFidoReturnValues.CB.Alert != null)
               {
-                replacements = Notification_CarbonBlack_Helper.CarbonBlackBadGuyReturn(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
-                replacements = VTReplacements(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
+                replaceParameters.Replacements = Notification_CarbonBlack_Helper.CarbonBlackBadGuyReturn(lFidoReturnValues, replaceParameters);
+                replaceParameters.Replacements = VTReplacements(lFidoReturnValues, replaceParameters);
               }
               break;
 
             case "panv1":
               if (lFidoReturnValues.PaloAlto != null)
               {
-                replacements = Notification_PaloAlto_Helper.PaloAltoBadGuyReturn(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
-                replacements = VTReplacements(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
+                replaceParameters.Replacements = Notification_PaloAlto_Helper.PaloAltoBadGuyReturn(lFidoReturnValues, replaceParameters);
+                replaceParameters.Replacements = VTReplacements(lFidoReturnValues, replaceParameters);
               }
               break;
 
@@ -84,8 +102,8 @@ namespace Fido_Main.Notification.Notification_Helper
               //Check Virustotal for values
               if (lFidoReturnValues.FireEye != null)
               {
-                replacements = MPSBadGuyReturn(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
-                replacements = VTReplacements(lFidoReturnValues, lBadMD5Hashes, lGoodMD5Hashes, lBadURLs, lGoodURLs, replacements);
+                replaceParameters.Replacements = MPSBadGuyReturn(lFidoReturnValues, replaceParameters);
+                replaceParameters.Replacements = VTReplacements(lFidoReturnValues, replaceParameters);
               }
 
               break;
@@ -111,25 +129,25 @@ namespace Fido_Main.Notification.Notification_Helper
                 }
 
                 //Check Bit9 for values
-                replacements.Add("%bit9threat%", lFidoReturnValues.Bit9.FileThreat);
-                replacements.Add("%bit9trust%", lFidoReturnValues.Bit9.FileTrust);
+                replaceParameters.Replacements.Add("%bit9threat%", lFidoReturnValues.Bit9.FileThreat);
+                replaceParameters.Replacements.Add("%bit9trust%", lFidoReturnValues.Bit9.FileTrust);
               }
 
               break;
           }
         }
-        return replacements;
+        return replaceParameters.Replacements;
       }
       catch (Exception e)
       {
         Fido_EventHandler.SendEmail("Fido Error", "Fido Failed: {0} Exception caught in Notification Help:" + e); 
       }
-      return replacements;
+      return replaceParameters.Replacements;
     }
     
     public static Dictionary<string, string> AntivirusReplacements(FidoReturnValues lFidoReturnValues)
     {
-      var replacements = new Dictionary<string, string>();
+      var replaceParameters.Replacements = new Dictionary<string, string>();
 
       if (lFidoReturnValues.MalwareType != null)
       {
@@ -240,7 +258,7 @@ namespace Fido_Main.Notification.Notification_Helper
       //Check Bit9 for values
       replacements.Add("%bit9threat%", "Not Configured");
       replacements.Add("%bit9trust%", "Not Configured");
-      replacements = MPSBadGuyReplacements(lFidoReturnValues, replacements);
+      replaceParameters.Replacements = MPSBadGuyReplacements(lFidoReturnValues, replacements);
       return replacements;
     }
 

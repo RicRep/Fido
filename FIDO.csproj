@@ -147,6 +147,7 @@
     <Compile Include="Fido_Support\Objects\ThreatGRID\Object_ThreatGRID_Configs.cs" />
     <Compile Include="Fido_Support\Objects\ThreatGRID\Object_ThreatGRID_IP_ConfigClass.cs" />
     <Compile Include="Fido_Support\Objects\ThreatGRID\Object_ThreatGRID_Search_ConfigClass.cs" />
+    <Compile Include="Main\Detectors\AlertHelper.cs" />
     <Compile Include="Main\Detectors\Detect_CarbonBlack.cs" />
     <Compile Include="Main\Detectors\Detect_Cyphort_v3.cs" />
     <Compile Include="Main\Detectors\Detect_Protectwise_v1.cs" />
